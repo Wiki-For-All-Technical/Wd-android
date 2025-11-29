@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Myapp"
+rootProject.name = "Wikiapp"
 include(":app")
  
