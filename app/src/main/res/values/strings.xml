@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Wikidata</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_contributions">Contributions</string>
+    <string name="nav_settings">Settings</string>
+    <string name="homepage_title">Wikidata</string>
+    <string name="homepage_subtitle">The free knowledge base</string>
+    <string name="main_content_placeholder">Welcome to Wikidata\n\nBrowse and edit structured data from the free knowledge base.</string>
+</resources>
