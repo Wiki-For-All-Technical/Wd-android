@@ -1,0 +1,118 @@
+<resources>
+    <string name="app_name">Wikidata</string>
+    <string name="welcome">Welcome</string>
+    <string name="welcome_to_wikidata">Welcome to Wikidata</string>
+    <string name="wikidata_description">the free knowledge base with 119,484,387 data items that anyone can edit.</string>
+    <string name="search_wikidata">Search Wikidata…</string>
+    <string name="search">Search</string>
+    <string name="search_results">Search results</string>
+    <string name="help">Help</string>
+    <string name="tools">Tools</string>
+    <string name="advanced_search">Advanced search:</string>
+    <string name="search_in_all_namespaces">Search in all namespaces</string>
+    <string name="search_in">Search in:</string>
+    <string name="main_namespace">(Main)</string>
+    <string name="results">Results</string>
+    <string name="of">of</string>
+    <string name="no_results">No results found for \"%s\"</string>
+    <string name="previous_20">← previous 20</string>
+    <string name="next_20">next 20 →</string>
+
+    <!-- Home Page Sections -->
+    <string name="welcome_section_title">Welcome!</string>
+    <string name="welcome_section_content">Wikidata is a free and open knowledge base that can be read and edited by both humans and machines. Wikidata acts as central storage for the structured data of its Wikimedia sister projects including Wikipedia, Wikivoyage, Wiktionary, Wikisource, and others. Wikidata also provides support to many other sites and services beyond just Wikimedia projects! The content of Wikidata is available under a free license, exported using standard formats, and can be interlinked to other open data sets on the linked data web.</string>
+
+    <string name="get_involved_title">Get involved</string>
+    <string name="get_involved_intro">For a complete starters\' guide, visit the community portal.</string>
+
+    <string name="learn_about_data_title">Learn about data</string>
+    <string name="learn_about_data_content">New to the wonderful world of data? Develop and improve your data literacy through content designed to get you up to speed and feeling comfortable with the fundamentals in no time.</string>
+
+    <string name="current_highlights_title">Current highlights</string>
+    <string name="discover_title">Discover</string>
+    <string name="contact_title">Contact</string>
+
+    <!-- Navigation -->
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="recent_changes">Recent Changes</string>
+    <string name="entity">Entity</string>
+    <string name="edit">Edit</string>
+    <string name="login">Log in</string>
+    <string name="logout">Log out</string>
+    <string name="menu">Menu</string>
+    <string name="random_item">Random Item</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+
+    <!-- User Profile -->
+    <string name="user_profile">User Profile</string>
+    <string name="logged_in_since">Logged in since %s</string>
+    <string name="my_contributions">My Contributions</string>
+    <string name="watchlist">Watchlist</string>
+    <string name="not_logged_in">You are not logged in.</string>
+
+    <!-- Login -->
+    <string name="login_to_wikidata">Login to Wikidata</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="oauth_consent">OAuth Consent</string>
+    <string name="oauth_permission_request">OAuth Permission Request</string>
+    <string name="oauth_description">The application requests permission to access your Wikidata account:</string>
+    <string name="oauth_permissions">This will allow the app to:\n• Read your user information\n• Make edits on your behalf\n• Access your watchlist</string>
+    <string name="allow">Allow</string>
+    <string name="deny">Deny</string>
+
+    <!-- Entity View -->
+    <string name="no_description">No description defined</string>
+    <string name="statements">%d statements</string>
+    <string name="sitelinks">%d sitelinks</string>
+
+    <!-- Error Messages -->
+    <string name="error_fetching_random">Failed to fetch a random item. Please try again.</string>
+    <string name="error_loading_entity">Failed to load entity</string>
+
+    <!-- Additional strings -->
+    <string name="search_placeholder">Search Wikidata…</string>
+    <string name="select_language">Select Language</string>
+    <string name="error_loading_data">Error loading data. Please try again.</string>
+    <string name="recent_articles">Recent Articles</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="no_recent_activity">No recent activity to display.</string>
+    <string name="introduction">Introduction</string>
+    <string name="project_chat">Project Chat</string>
+    <string name="community_portal">Community Portal</string>
+    <string name="structured_data">structured data</string>
+    <string name="free_license">available under a free license</string>
+    <string name="standard_formats">standard formats</string>
+    <string name="interlinked_data">can be interlinked to other open data sets</string>
+    <string name="learn_about_wikidata">Learn about Wikidata</string>
+    <string name="wikidata_introduction">What is Wikidata? Read the Wikidata introduction.</string>
+    <string name="explore_wikidata">Explore Wikidata by looking at a featured showcase item for author Douglas Adams (Q42).</string>
+    <string name="sparql_service">Get started with Wikidata\'s SPARQL query service.</string>
+    <string name="contribute_to_wikidata">Contribute to Wikidata</string>
+    <string name="learn_to_edit">Learn to edit Wikidata: follow the tutorials.</string>
+    <string name="join_wikiproject">Work with other volunteers on a subject that interests you: join a WikiProject.</string>
+    <string name="donate_data">Individuals and organizations can also donate data.</string>
+    <string name="meet_community">Meet the Wikidata community</string>
+    <string name="visit_community_portal">Visit the community portal or attend a Wikidata event.</string>
+    <string name="create_account">Create a user account.</string>
+    <string name="ask_questions">Talk and ask questions on the Project chat, Telegram groups, or the live IRC chat.</string>
+    <string name="featured_wikiproject">Featured WikiProject:</string>
+    <string name="wikiproject_women">WikiProject Women</string>
+    <string name="women_achievements">👩‍🔬 🏔️ Passionate about highlighting women\'s achievements?</string>
+    <string name="close_gender_gap">WikiProject Women is dedicated to creating and improving data about women worldwide. Help close the gender gap in knowledge!</string>
+    <string name="wikidata_tools">Check out Wikidata:Tools for some of our best tools and gadgets for using and exploring Wikidata</string>
+    <string name="spinach_assistant">Try building SPARQL queries and inquiring data using natural language using the Spinach Wikidata assistant</string>
+    <string name="bot_lists">See the category for user-made bot-updated lists of Wikidata items</string>
+    <string name="nominate_content">Know of an interesting project or research conducted using Wikidata? You can nominate content to be featured on the Main page here!</string>
+    <string name="mailing_list">Wikidata mailing list</string>
+    <string name="technical_mailing_list">Wikidata technical mailing list</string>
+    <string name="discussion_requests">Discussion requests for specific topics</string>
+    <string name="telegram_chat">Telegram General Chat</string>
+    <string name="telegram_help">Telegram Help</string>
+    <string name="irc_chat">IRC connect</string>
+    <string name="report_problem">Report a technical problem</string>
+    <string name="weekly_summaries">Keep up-to-date: Weekly summaries</string>
+</resources>

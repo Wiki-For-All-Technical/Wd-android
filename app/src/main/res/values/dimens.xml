@@ -1,0 +1,33 @@
+<resources>
+    <!-- Spacing (from Tailwind/padding) -->
+    <dimen name="spacing_1">4dp</dimen>
+    <dimen name="spacing_2">8dp</dimen>
+    <dimen name="spacing_3">12dp</dimen>
+    <dimen name="spacing_4">16dp</dimen>
+    <dimen name="spacing_5">20dp</dimen>
+    <dimen name="spacing_6">24dp</dimen>
+    <dimen name="spacing_8">32dp</dimen>
+
+    <!-- Border radii -->
+    <dimen name="border_radius_sm">4dp</dimen>
+    <dimen name="border_radius_md">6dp</dimen>
+    <dimen name="border_radius_lg">8dp</dimen>
+    <dimen name="border_radius_xl">12dp</dimen>
+
+    <!-- Component sizes -->
+    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="top_app_bar_height">64dp</dimen>
+    <dimen name="icon_size_small">16dp</dimen>
+    <dimen name="icon_size_medium">20dp</dimen>
+    <dimen name="icon_size_large">24dp</dimen>
+
+    <!-- Text sizes (from your CSS) -->
+    <dimen name="text_xs">12sp</dimen>
+    <dimen name="text_sm">14sp</dimen>
+    <dimen name="text_base">16sp</dimen>
+    <dimen name="text_lg">18sp</dimen>
+    <dimen name="text_xl">20sp</dimen>
+    <dimen name="text_2xl">24sp</dimen>
+    <dimen name="text_3xl">30sp</dimen>
+    <dimen name="text_4xl">36sp</dimen>
+</resources>

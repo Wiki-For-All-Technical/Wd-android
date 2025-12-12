@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Black and Royal Blue Theme Colors -->
+    <color name="primary_blue">#4169E1</color>
+    <color name="primary_blue_dark">#003366</color>
+    <color name="primary_blue_light">#E6F2FF</color>
+    <color name="link_blue">#4169E1</color>
+    <color name="background_light">#FFFFFF</color>
+    <color name="surface_light">#FFFFFF</color>
+    <color name="text_primary_light">#000000</color>
+    <color name="text_secondary_light">#333333</color>
+    <color name="divider_light">#000000</color>
+    <color name="toolbar_background">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_elevation">#E5E5E5</color>
+    
+    <!-- Royal Blue Accent Colors -->
+    <color name="accent_blue">#4169E1</color>
+    <color name="accent_green">#4169E1</color>
+    <color name="accent_orange">#4169E1</color>
+    <color name="accent_purple">#4169E1</color>
+    <color name="accent_red">#4169E1</color>
+    <color name="accent_yellow">#4169E1</color>
+    
+    <!-- Section header colors - Royal Blue -->
+    <color name="section_header_blue">#4169E1</color>
+    <color name="section_header_green">#4169E1</color>
+    <color name="section_header_orange">#4169E1</color>
+    
+    <!-- Text hints -->
+    <color name="text_hint">#999999</color>
+    
+    <!-- Shadows and overlays -->
+    <color name="overlay_dark">#80000000</color>
+
+    <!-- Wikidata Brand Colors -->
+    <color name="wikidata_blue">#3366CC</color>
+    <color name="wikidata_dark_blue">#2A4B8D</color>
+    <color name="wikidata_green">#489D74</color>
+    <color name="wikidata_red">#990000</color>
+    <color name="text_primary">#000000</color>
+</resources>

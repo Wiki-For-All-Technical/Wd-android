@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Theme Colors - Black and Royal Blue -->
+    <color name="primary_blue">#4169E1</color>
+    <color name="primary_blue_dark">#003366</color>
+    <color name="primary_blue_light">#1A2F4A</color>
+    <color name="link_blue">#4169E1</color>
+    <color name="background_light">#000000</color>
+    <color name="surface_light">#000000</color>
+    <color name="text_primary_light">#FFFFFF</color>
+    <color name="text_secondary_light">#CCCCCC</color>
+    <color name="divider_light">#4169E1</color>
+    <color name="toolbar_background">#000000</color>
+    <color name="card_background">#1A1A1A</color>
+    <color name="card_elevation">#333333</color>
+    
+    <!-- Accent colors - Royal Blue -->
+    <color name="accent_blue">#4169E1</color>
+    <color name="accent_green">#4169E1</color>
+    <color name="accent_orange">#4169E1</color>
+    <color name="accent_purple">#4169E1</color>
+    
+    <!-- Text hints -->
+    <color name="text_hint">#808080</color>
+    
+    <!-- Shadows and overlays -->
+    <color name="overlay_dark">#80000000</color>
+</resources>
+
+
+

@@ -1,0 +1,44 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.WikidataMobileLite" parent="Theme.Material3.DayNight">
+        <!-- Material 3 uses different attribute names -->
+        <item name="colorPrimary">@color/wikidata_blue</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/wikidata_dark_blue</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+        <item name="colorSecondary">@color/wikidata_green</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/wikidata_red</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryContainer</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+    </style>
+
+    <style name="Theme.WikidataMobileLite" parent="Base.Theme.WikidataMobileLite" />
+
+    <!-- AppBar and Toolbar styles -->
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.Material3.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3.Light" />
+
+    <style name="ToolbarTitleStyle" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">serif</item>
+    </style>
+
+    <!-- Custom styles for Wikidata sections -->
+    <style name="WikidataSectionTitle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="ContentTextStyle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+</resources>
