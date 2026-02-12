@@ -230,13 +230,15 @@ private fun SuggestionItem(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            // Label
+            // Label with Q number: "Label (Q1234)"
+            val label = suggestion.label
+                ?: suggestion.display?.label?.value
+                ?: suggestion.title
+                ?: "Unknown"
+            val entityId = suggestion.id ?: ""
+            
             Text(
-                text = suggestion.label
-                    ?: suggestion.display?.label?.value
-                    ?: suggestion.title
-                    ?: suggestion.id
-                    ?: "Unknown",
+                text = if (entityId.isNotEmpty()) "$label ($entityId)" else label,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = Base10,
@@ -257,27 +259,6 @@ private fun SuggestionItem(
             }
         }
         
-        // Entity ID badge (Q number)
-        val entityId = suggestion.id ?: ""
-        val badgeColor = when {
-            entityId.startsWith("Q") -> WikidataItemGreen
-            entityId.startsWith("P") -> WikidataPropertyOrange
-            entityId.startsWith("L") -> WikidataLexemePurple
-            else -> WikidataTeal
-        }
-        
-        Surface(
-            color = badgeColor.copy(alpha = 0.1f),
-            shape = RoundedCornerShape(4.dp)
-        ) {
-            Text(
-                text = entityId,
-                style = MaterialTheme.typography.labelSmall,
-                color = badgeColor,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-            )
-        }
     }
 }
 
@@ -580,41 +561,20 @@ private fun WikidataSearchResultItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.Top
         ) {
-            // Entity type indicator (Q/P/L badge)
-            val entityId = result.id ?: ""
-            val badgeColor = when {
-                entityId.startsWith("Q") -> WikidataItemGreen
-                entityId.startsWith("P") -> WikidataPropertyOrange
-                entityId.startsWith("L") -> WikidataLexemePurple
-                else -> WikidataTeal
-            }
-            
-            Surface(
-                color = badgeColor.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(4.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, badgeColor.copy(alpha = 0.3f))
-            ) {
-                Text(
-                    text = entityId,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = badgeColor,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                )
-            }
-            
             // Content
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // Label
+                // Label with Q number: "Label (Q1234)"
+                val label = result.label
+                    ?: result.display?.label?.value
+                    ?: result.title
+                    ?: "Unknown"
+                val entityId = result.id ?: ""
+                
                 Text(
-                    text = result.label
-                        ?: result.display?.label?.value
-                        ?: result.title
-                        ?: result.id
-                        ?: "Unknown",
+                    text = if (entityId.isNotEmpty()) "$label ($entityId)" else label,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = AccentBlue,

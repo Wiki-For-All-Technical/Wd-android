@@ -1,6 +1,7 @@
 package com.example.wikiapp.ui.entity
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -20,9 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,13 +45,12 @@ fun EntityDetailScreen(
     onNavigateBack: () -> Unit,
     onEntityClick: (String) -> Unit,
     onEditClick: () -> Unit = {},
+    onNavigateToEdit: (entityId: String, entityLabel: String, propertyId: String?, propertyLabel: String?, currentValue: String?) -> Unit = { _, _, _, _, _ -> },
     authViewModel: AuthViewModel = viewModel(),
     viewModel: EntityViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
-    
-    var showLoginPrompt by remember { mutableStateOf(false) }
     
     LaunchedEffect(entityId) {
         viewModel.loadEntity(entityId)
@@ -75,15 +79,23 @@ fun EntityDetailScreen(
                 )
             }
             uiState.entity != null -> {
+                val entity = uiState.entity!!
+                val entityLabel = entity.labels?.get("en")?.value 
+                    ?: entity.labels?.values?.firstOrNull()?.value 
+                    ?: entityId
+                    
                 EntityContent(
-                    entity = uiState.entity!!,
+                    entity = entity,
                     propertyLabels = uiState.propertyLabels,
+                    entityLabels = uiState.entityLabels,
                     onEntityClick = onEntityClick,
                     isLoggedIn = authState.isLoggedIn,
-                    onEditClick = {
+                    onEditClick = { propertyId, propertyLabel, currentValue ->
                         if (authState.isLoggedIn) {
-                            showLoginPrompt = false
+                            // Navigate to Edit screen
+                            onNavigateToEdit(entityId, entityLabel, propertyId, propertyLabel, currentValue)
                         } else {
+                            // Navigate to Login
                             onEditClick()
                         }
                     },
@@ -130,9 +142,9 @@ private fun WikidataEntityTopBar(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     WikidataBarcodeIcon(size = 24)
-                    Text(
+                Text(
                         text = "WIKIDATA",
-                        style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Base10,
                         letterSpacing = 1.sp
@@ -151,7 +163,7 @@ private fun WikidataEntityTopBar(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Icon(
+                Icon(
                             Icons.Default.Person,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
@@ -283,9 +295,10 @@ private fun ErrorState(
 private fun EntityContent(
     entity: WikidataEntity,
     propertyLabels: Map<String, String>,
+    entityLabels: Map<String, String>,
     onEntityClick: (String) -> Unit,
     isLoggedIn: Boolean = false,
-    onEditClick: () -> Unit = {},
+    onEditClick: (propertyId: String?, propertyLabel: String?, currentValue: String?) -> Unit = { _, _, _ -> },
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -293,7 +306,11 @@ private fun EntityContent(
     ) {
         // Entity Header - Wikidata style
         item {
-            EntityHeader(entity = entity, isLoggedIn = isLoggedIn, onEditClick = onEditClick)
+            EntityHeader(
+                entity = entity, 
+                isLoggedIn = isLoggedIn, 
+                onEditClick = { onEditClick(null, null, null) }
+            )
         }
         
         // Tabs bar (Item | Discussion - Read | View history | Tools)
@@ -322,13 +339,18 @@ private fun EntityContent(
             }
             
             claims.entries.forEach { (propertyId, claimList) ->
+                val propLabel = propertyLabels[propertyId]
                 item(key = propertyId) {
                     StatementGroup(
                         propertyId = propertyId,
-                        propertyLabel = propertyLabels[propertyId],
+                        propertyLabel = propLabel,
                         claims = claimList,
+                        entityLabels = entityLabels,
                         onEntityClick = onEntityClick,
-                        onEditClick = onEditClick
+                        onEditClick = { currentValue ->
+                            onEditClick(propertyId, propLabel, currentValue)
+                        },
+                        isLoggedIn = isLoggedIn
                     )
                 }
             }
@@ -342,7 +364,7 @@ private fun EntityContent(
         }
         
         // Footer spacing
-        item {
+            item {
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
@@ -409,11 +431,11 @@ private fun EntityHeader(
         }
         
         // Main label/title
-        Text(
-            text = entity.labels?.get("en")?.value 
-                ?: entity.labels?.values?.firstOrNull()?.value 
-                ?: entity.id,
-            style = MaterialTheme.typography.headlineMedium,
+            Text(
+                text = entity.labels?.get("en")?.value 
+                    ?: entity.labels?.values?.firstOrNull()?.value 
+                    ?: entity.id,
+                style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Normal,
             color = Base10
         )
@@ -462,18 +484,18 @@ private fun TabItem(
             modifier = Modifier
                 .clickable { }
                 .padding(vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (isSelected) AccentBlue else Base30
             )
             if (hasDropdown) {
-                Icon(
+                    Icon(
                     Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
+                        contentDescription = null,
                     modifier = Modifier.size(16.dp),
                     tint = Base30
                 )
@@ -542,32 +564,32 @@ private fun StatementsHeader(count: Int) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = Base90
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
+        Text(
                 text = "Statements",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.SemiBold,
                 color = Base10
-            )
+        )
             
-            Surface(
+        Surface(
                 color = WikidataTeal.copy(alpha = 0.1f),
                 shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = count.toString(),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = WikidataTeal,
+        ) {
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                color = WikidataTeal,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                )
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+            )
             }
         }
     }
@@ -578,42 +600,44 @@ private fun StatementGroup(
     propertyId: String,
     propertyLabel: String?,
     claims: List<Claim>,
+    entityLabels: Map<String, String>,
     onEntityClick: (String) -> Unit,
-    onEditClick: () -> Unit = {}
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
+    onEditClick: (currentValue: String?) -> Unit = {},
+    isLoggedIn: Boolean = false
     ) {
-        // Property row with orange left border for properties (Wikidata style)
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
+            .background(Color.White)
+        ) {
+        // Property row with orange left border for properties (Wikidata style)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
                 .drawLeftBorder(WikidataPropertyOrange)
                 .background(Base90.copy(alpha = 0.5f))
                 .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
             // Property ID badge (P number)
             Surface(
                 color = WikidataPropertyOrange.copy(alpha = 0.15f),
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier.clickable { onEntityClick(propertyId) }
-            ) {
-                Text(
-                    text = propertyId,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
+                ) {
+                    Text(
+                        text = propertyId,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
                     color = WikidataPropertyOrange,
                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-                )
-            }
-            
+                    )
+                }
+                
             // Property label
-            Text(
-                text = propertyLabel ?: propertyId,
+                Text(
+                    text = propertyLabel ?: propertyId,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = AccentBlue,
@@ -624,7 +648,7 @@ private fun StatementGroup(
             
             // Edit icon - triggers login if not logged in
             IconButton(
-                onClick = onEditClick,
+                onClick = { onEditClick(null) },
                 modifier = Modifier.size(32.dp)
             ) {
                 Icon(
@@ -637,11 +661,13 @@ private fun StatementGroup(
         }
         
         // Values with edit icons
-        claims.forEach { claim ->
-            StatementValue(
-                claim = claim,
+            claims.forEach { claim ->
+                StatementValue(
+                    claim = claim,
+                entityLabels = entityLabels,
                 onEntityClick = onEntityClick,
-                onEditClick = onEditClick
+                onEditClick = onEditClick,
+                isLoggedIn = isLoggedIn
             )
         }
         
@@ -664,17 +690,35 @@ private fun Modifier.drawLeftBorder(color: Color) = this.then(
 @Composable
 private fun StatementValue(
     claim: Claim,
+    entityLabels: Map<String, String>,
     onEntityClick: (String) -> Unit,
-    onEditClick: () -> Unit = {}
+    onEditClick: (currentValue: String?) -> Unit = {},
+    isLoggedIn: Boolean = false
 ) {
     val dataValue = claim.mainsnak.datavalue
     
-    Row(
+    // Extract the current value as a string for editing
+    val currentValueString = remember(dataValue) {
+        extractDisplayValue(dataValue, entityLabels)
+    }
+    
+    // State for inline editing
+    var isEditing by remember { mutableStateOf(false) }
+    var editedValue by remember { mutableStateOf(currentValueString) }
+    val focusManager = LocalFocusManager.current
+    
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .background(Color.White)
+    ) {
+        // Main value display row
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Rank indicator
         val rankColor = when (claim.rank) {
@@ -683,15 +727,15 @@ private fun StatementValue(
             else -> NormalRankColor
         }
         
-        Icon(
-            when (claim.rank) {
-                "preferred" -> Icons.Default.KeyboardDoubleArrowUp
-                "deprecated" -> Icons.Default.KeyboardDoubleArrowDown
-                else -> Icons.Default.Remove
-            },
-            contentDescription = "Rank: ${claim.rank}",
-            modifier = Modifier.size(16.dp),
-            tint = rankColor
+            Icon(
+                when (claim.rank) {
+                    "preferred" -> Icons.Default.KeyboardDoubleArrowUp
+                    "deprecated" -> Icons.Default.KeyboardDoubleArrowDown
+                    else -> Icons.Default.Remove
+                },
+                contentDescription = "Rank: ${claim.rank}",
+                modifier = Modifier.size(16.dp),
+                tint = rankColor
         )
         
         Column(
@@ -703,56 +747,247 @@ private fun StatementValue(
                 "wikibase-item", "wikibase-property" -> {
                     EntityValueDisplay(
                         dataValue = dataValue,
-                        onClick = { entityId -> onEntityClick(entityId) }
+                            entityLabels = entityLabels,
+                            onClick = { entityId -> onEntityClick(entityId) }
+                        )
+                    }
+                    "time" -> TimeValueDisplay(dataValue = dataValue)
+                    "quantity" -> QuantityValueDisplay(dataValue = dataValue)
+                    "globe-coordinate" -> CoordinateValueDisplay(dataValue = dataValue)
+                    "url" -> UrlValueDisplay(dataValue = dataValue)
+                    "external-id" -> ExternalIdValueDisplay(dataValue = dataValue)
+                    else -> GenericValueDisplay(dataValue = dataValue)
+                }
+                
+                // Qualifiers
+                claim.qualifiers?.takeIf { it.isNotEmpty() }?.let { qualifiers ->
+                    QualifiersDisplay(
+                        qualifiers = qualifiers,
+                        entityLabels = entityLabels,
+                        onEntityClick = onEntityClick
                     )
                 }
-                "time" -> TimeValueDisplay(dataValue = dataValue)
-                "quantity" -> QuantityValueDisplay(dataValue = dataValue)
-                "globe-coordinate" -> CoordinateValueDisplay(dataValue = dataValue)
-                "url" -> UrlValueDisplay(dataValue = dataValue)
-                "external-id" -> ExternalIdValueDisplay(dataValue = dataValue)
-                else -> GenericValueDisplay(dataValue = dataValue)
+                
+                // References count
+                claim.references?.takeIf { it.isNotEmpty() }?.let { refs ->
+                    Text(
+                        text = "References (${refs.size} total)",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AccentBlue,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .clickable { }
+                    )
+                }
             }
             
-            // Qualifiers
-            claim.qualifiers?.takeIf { it.isNotEmpty() }?.let { qualifiers ->
-                QualifiersDisplay(
-                    qualifiers = qualifiers,
-                    onEntityClick = onEntityClick
-                )
-            }
-            
-            // References count
-            claim.references?.takeIf { it.isNotEmpty() }?.let { refs ->
-                Text(
-                    text = "${refs.size} reference${if (refs.size > 1) "s" else ""}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = AccentBlue,
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .clickable { }
-                )
+            // Action icons: References badge, Edit, Add/Remove
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // References badge
+                claim.references?.takeIf { it.isNotEmpty() }?.let { refs ->
+                    Surface(
+                        color = AccentBlue.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "${refs.size} ref${if (refs.size > 1) "s" else ""}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = AccentBlue,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+                
+                // Edit icon
+                if (isLoggedIn) {
+                    IconButton(
+                        onClick = { 
+                            isEditing = true
+                            editedValue = currentValueString
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Outlined.Edit,
+                            contentDescription = "Edit this value",
+                            modifier = Modifier.size(18.dp),
+                            tint = Base50
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = { onEditClick(currentValueString) },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Outlined.Edit,
+                            contentDescription = "Edit this value",
+                            modifier = Modifier.size(18.dp),
+                            tint = Base50
+                        )
+                    }
+                }
+                
+                // Add/Remove icon
+                if (isLoggedIn) {
+                    IconButton(
+                        onClick = { /* Add new value */ },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Add value",
+                            modifier = Modifier.size(18.dp),
+                            tint = Base50
+                        )
+                    }
+                }
             }
         }
         
-        // Edit icon for this value
-        IconButton(
-            onClick = onEditClick,
-            modifier = Modifier.size(32.dp)
+        // Inline Edit Section (expands when editing)
+        AnimatedVisibility(
+            visible = isEditing && isLoggedIn,
+            enter = expandVertically(animationSpec = tween(300)) + fadeIn(),
+            exit = shrinkVertically(animationSpec = tween(300)) + fadeOut()
         ) {
-            Icon(
-                Icons.Outlined.Edit,
-                contentDescription = "Edit this value",
-                modifier = Modifier.size(16.dp),
-                tint = Base50
+            InlineEditSection(
+                currentValue = currentValueString,
+                editedValue = editedValue,
+                onValueChange = { editedValue = it },
+                onSave = {
+                    // Save logic here
+                    isEditing = false
+                    focusManager.clearFocus()
+                },
+                onCancel = {
+                    isEditing = false
+                    editedValue = currentValueString
+                    focusManager.clearFocus()
+                }
             )
         }
     }
 }
 
 @Composable
+private fun InlineEditSection(
+    currentValue: String,
+    editedValue: String,
+    onValueChange: (String) -> Unit,
+    onSave: () -> Unit,
+    onCancel: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        color = Base90.copy(alpha = 0.5f),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // "Edit Value:" label
+            Text(
+                text = "Edit Value:",
+                style = MaterialTheme.typography.labelMedium,
+                color = Base30,
+                fontWeight = FontWeight.Medium
+            )
+            
+            // Text input field
+            OutlinedTextField(
+                value = editedValue,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Enter value...", color = Base50) },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = WikidataTeal,
+                    unfocusedBorderColor = Base70,
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
+                ),
+                shape = RoundedCornerShape(4.dp)
+            )
+            
+            // Save and Cancel buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Save button
+                Button(
+                    onClick = onSave,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = WikidataTeal
+                    ),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(
+                        text = "Save",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+                
+                // Cancel button
+                OutlinedButton(
+                    onClick = onCancel,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Base30
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Base70),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(
+                        text = "Cancel",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun extractDisplayValue(dataValue: DataValue?, entityLabels: Map<String, String>): String {
+    if (dataValue == null) return ""
+    return when (val value = dataValue.value) {
+        is String -> value
+        is Map<*, *> -> {
+            val entityId = value["id"] as? String
+            if (entityId != null) {
+                entityLabels[entityId] ?: entityId
+            } else {
+                val time = value["time"] as? String
+                if (time != null) {
+                    time.removePrefix("+").take(10)
+                } else {
+                    val amount = value["amount"] as? String
+                    amount?.removePrefix("+") ?: value["value"] as? String ?: ""
+                }
+            }
+        }
+        else -> value?.toString() ?: ""
+    }
+}
+
+@Composable
 private fun EntityValueDisplay(
     dataValue: DataValue?,
+    entityLabels: Map<String, String>,
     onClick: (String) -> Unit
 ) {
     if (dataValue == null) {
@@ -767,40 +1002,66 @@ private fun EntityValueDisplay(
     
     val value = dataValue.value as? Map<*, *>
     val entityId = value?.get("id") as? String ?: return
+    val entityLabel = entityLabels[entityId]
     
     // Determine entity type color based on Q/P/L prefix
     val entityColor = when {
-        entityId.startsWith("Q") -> WikidataItemGreen
-        entityId.startsWith("P") -> WikidataPropertyOrange
+            entityId.startsWith("Q") -> WikidataItemGreen
+            entityId.startsWith("P") -> WikidataPropertyOrange
         entityId.startsWith("L") -> WikidataLexemePurple
-        else -> WikidataTeal
-    }
-    
-    // Clickable Q number badge
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(entityColor.copy(alpha = 0.1f))
-            .border(1.dp, entityColor.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
-            .clickable { onClick(entityId) }
-            .padding(horizontal = 10.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Text(
-            text = entityId,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = entityColor
-        )
+            else -> WikidataTeal
+        }
         
-        // Arrow icon to indicate it's clickable/navigable
+    // Clickable card showing Label + Q number
+    Surface(
+            modifier = Modifier
+            .clickable { onClick(entityId) },
+        color = entityColor.copy(alpha = 0.08f),
+        shape = RoundedCornerShape(8.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, entityColor.copy(alpha = 0.2f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            // Main content: Label with Q number in format "Label (Q1234)"
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                // Entity Label with Q number: "Label (Q1234)"
+                Text(
+                    text = if (entityLabel != null) "$entityLabel ($entityId)" else entityId,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = AccentBlue,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                
+                // Entity type indicator
+                val entityType = when {
+                    entityId.startsWith("Q") -> "Item"
+                    entityId.startsWith("P") -> "Property"
+                    entityId.startsWith("L") -> "Lexeme"
+                    else -> "Entity"
+                }
+                Text(
+                    text = "• $entityType",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Base50
+                )
+            }
+            
+            // Arrow icon to indicate navigation
         Icon(
-            Icons.Default.ArrowForward,
-            contentDescription = "View $entityId",
-            modifier = Modifier.size(14.dp),
-            tint = entityColor.copy(alpha = 0.7f)
-        )
+                Icons.Default.ChevronRight,
+                contentDescription = "View $entityId",
+                modifier = Modifier.size(20.dp),
+                tint = entityColor.copy(alpha = 0.7f)
+            )
+        }
     }
 }
 
@@ -817,11 +1078,38 @@ private fun TimeValueDisplay(dataValue: DataValue?) {
         else -> time.removePrefix("+").take(10)
     }
     
-    Text(
-        text = displayTime,
-        style = MaterialTheme.typography.bodyMedium,
-        color = Base10
-    )
+    // Format date nicely: "11 March 1952"
+    val formattedDate = try {
+        if (displayTime.length >= 10) {
+            val year = displayTime.substring(0, 4)
+            val month = displayTime.substring(5, 7).toInt()
+            val day = displayTime.substring(8, 10).toInt()
+            val monthNames = listOf("", "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December")
+            "$day ${monthNames.getOrElse(month) { month.toString() }} $year"
+        } else {
+            displayTime
+        }
+    } catch (e: Exception) {
+        displayTime
+    }
+    
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Icon(
+            Icons.Default.CalendarToday,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = Base50
+        )
+        Text(
+            text = formattedDate,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Base10
+        )
+    }
 }
 
 @Composable
@@ -857,11 +1145,11 @@ private fun CoordinateValueDisplay(dataValue: DataValue?) {
     val lat = (value?.get("latitude") as? Number)?.toDouble() ?: 0.0
     val lon = (value?.get("longitude") as? Number)?.toDouble() ?: 0.0
     
-    Text(
+        Text(
         text = "%.4f°, %.4f°".format(lat, lon),
         style = MaterialTheme.typography.bodyMedium,
         color = Base10
-    )
+        )
 }
 
 @Composable
@@ -881,12 +1169,12 @@ private fun UrlValueDisplay(dataValue: DataValue?) {
 private fun ExternalIdValueDisplay(dataValue: DataValue?) {
     val value = dataValue?.value as? String ?: dataValue?.value?.toString() ?: "Unknown"
     
-    Text(
-        text = value,
-        style = MaterialTheme.typography.bodyMedium,
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
         fontFamily = FontFamily.Monospace,
         color = Base10
-    )
+        )
 }
 
 @Composable
@@ -907,6 +1195,7 @@ private fun GenericValueDisplay(dataValue: DataValue?) {
 @Composable
 private fun QualifiersDisplay(
     qualifiers: Map<String, List<Snak>>,
+    entityLabels: Map<String, String>,
     onEntityClick: (String) -> Unit
 ) {
     Column(
@@ -920,15 +1209,27 @@ private fun QualifiersDisplay(
         qualifiers.entries.take(5).forEach { (propId, snaks) ->
             snaks.forEach { snak ->
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Property badge
+                    Surface(
+                        color = WikidataPropertyOrange.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(3.dp)
                 ) {
                     Text(
                         text = propId,
                         style = MaterialTheme.typography.labelSmall,
-                        color = AccentBlue
+                            fontWeight = FontWeight.Medium,
+                            color = WikidataPropertyOrange,
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                     )
+                    }
+                    
+                    // Value with label resolution
+                    val displayValue = formatSnakValueWithLabel(snak, entityLabels)
                     Text(
-                        text = formatSnakValue(snak),
+                        text = displayValue,
                         style = MaterialTheme.typography.bodySmall,
                         color = Base30
                     )
@@ -953,6 +1254,26 @@ private fun formatSnakValue(snak: Snak): String {
     }
 }
 
+private fun formatSnakValueWithLabel(snak: Snak, entityLabels: Map<String, String>): String {
+    val dataValue = snak.datavalue ?: return "unknown"
+    return when (val value = dataValue.value) {
+        is String -> value
+        is Map<*, *> -> {
+            val entityId = value["id"] as? String
+            if (entityId != null) {
+                // Return label if available, otherwise the ID
+                entityLabels[entityId] ?: entityId
+            } else {
+                value["time"] as? String
+                    ?: value["amount"] as? String
+                    ?: value["value"] as? String
+                    ?: value.toString()
+            }
+        }
+        else -> value?.toString() ?: "unknown"
+    }
+}
+
 @Composable
 private fun SitelinksSection(sitelinks: Map<String, SiteLink>) {
     Column(
@@ -964,8 +1285,8 @@ private fun SitelinksSection(sitelinks: Map<String, SiteLink>) {
             color = Base90
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -993,24 +1314,24 @@ private fun SitelinksSection(sitelinks: Map<String, SiteLink>) {
         }
         
         // Sitelinks list (display only, no browser opening)
-        val sortedSitelinks = sitelinks.entries
-            .filter { it.key.endsWith("wiki") && !it.key.contains("quote") }
-            .sortedBy { 
-                when (it.key) {
-                    "enwiki" -> 0
-                    "dewiki" -> 1
-                    "frwiki" -> 2
-                    "eswiki" -> 3
-                    "jawiki" -> 4
-                    else -> 10
+            val sortedSitelinks = sitelinks.entries
+                .filter { it.key.endsWith("wiki") && !it.key.contains("quote") }
+                .sortedBy { 
+                    when (it.key) {
+                        "enwiki" -> 0
+                        "dewiki" -> 1
+                        "frwiki" -> 2
+                        "eswiki" -> 3
+                        "jawiki" -> 4
+                        else -> 10
+                    }
                 }
-            }
-            .take(10)
-        
-        sortedSitelinks.forEach { (site, sitelink) ->
-            val languageCode = site.removeSuffix("wiki")
-            val languageName = getLanguageName(languageCode)
+                .take(10)
             
+            sortedSitelinks.forEach { (site, sitelink) ->
+                val languageCode = site.removeSuffix("wiki")
+                val languageName = getLanguageName(languageCode)
+                
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = Color.White
@@ -1059,14 +1380,14 @@ private fun SitelinksSection(sitelinks: Map<String, SiteLink>) {
         }
         
         // Show remaining count
-        val remaining = sitelinks.size - sortedSitelinks.size
-        if (remaining > 0) {
-            Text(
+            val remaining = sitelinks.size - sortedSitelinks.size
+            if (remaining > 0) {
+                Text(
                 text = "+$remaining more languages available",
-                style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelMedium,
                 color = Base50,
                 modifier = Modifier.padding(16.dp)
-            )
+                )
         }
     }
 }
