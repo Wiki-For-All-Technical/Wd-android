@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)https://www.genspark.ai/api/files/s/VaVWmbvT -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Existing System Limitations</title>
+<link href="https://fonts.googleapis.com/" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect">
+<link href="./css2" rel="stylesheet">
+<link href="./tailwind.min.css" rel="stylesheet">
+<link href="./all.min.css" rel="stylesheet">
+<style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            color: #202124;
+        }
+
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: #FAFAFA;
+        }
+
+        /* Geometric Backgrounds */
+        .bg-shape-top {
+            position: absolute;
+            top: -150px;
+            right: -100px;
+            width: 600px;
+            height: 600px;
+            background-color: #FFF3E0; /* Light Orange */
+            border-radius: 40px;
+            transform: rotate(15deg);
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        .bg-shape-bottom {
+            position: absolute;
+            bottom: -100px;
+            left: -100px;
+            width: 500px;
+            height: 500px;
+            background-color: #F3E5F5; /* Light Purple */
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        /* Problem Card Styles */
+        .problem-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            border-left: 6px solid #FFB74D; /* Orange 300 */
+            transition: transform 0.2s ease;
+        }
+
+        .problem-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .problem-card:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #FFF3E0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #EF6C00;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        /* Device Mockup for Mobile Web */
+        .device-frame {
+            border: 8px solid #374151;
+            border-radius: 24px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .browser-chrome {
+            background-color: #F3F4F6;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .url-bar {
+            background-color: white;
+            border-radius: 12px;
+            height: 24px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            font-size: 10px;
+            color: #9CA3AF;
+        }
+
+        /* Typography */
+        h1 { letter-spacing: -1px; }
+        
+        .alert-badge {
+            background-color: #FEF2F2;
+            color: #DC2626;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+    </style>
+<style id="slide-selected-style">
+  [data-slide-selected]::before
+  /* [data-slide-hover-selected]::before */ {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 100%;
+    height: 100%;
+    box-sizing: content-box;
+    padding: 4px;
+    border-radius: 0px;
+    outline: 2px solid #0f7fff !important;
+    z-index: 10000;
+    pointer-events: none;
+  }
+
+ /* [data-slide-hover-selected], */
+  [data-slide-selected] {
+    position: relative;
+    outline: none;
+    cursor: default;
+  }
+
+  img[data-slide-selected],
+  img[data-slide-hover-selected],
+  [data-slide-hover-selected],
+  [item-slide-click-selected],
+  [item-slide-selected] {
+    border: 2px solid #0f7fff !important;
+  }
+
+
+</style></head>
+<body>
+<div class="slide-container">
+<!-- Background Elements -->
+<div class="bg-shape-top"></div>
+<div class="bg-shape-bottom"></div>
+<!-- Content Wrapper -->
+<div class="relative z-10 flex h-full p-20 gap-16">
+<!-- Left Column: Context & Visual -->
+<div class="w-2/5 flex flex-col justify-center">
+<div class="mb-4">
+<span class="alert-badge">
+<i class="fas fa-exclamation-triangle"></i>
+                    Current State
+                </span>
+</div>
+<h1 class="text-5xl font-black text-gray-800 leading-tight mb-6">
+                Existing<br>System
+            </h1>
+<p class="text-xl text-gray-600 font-light leading-relaxed mb-10">
+                The current ecosystem relies heavily on the mobile web experience, which wasn't originally designed for complex data curation on small screens.
+            </p>
+<!-- Visual Representation of "Mobile Web" -->
+<div class="flex justify-center">
+<div class="device-frame w-64 h-96 transform -rotate-3 hover:rotate-0 transition-transform duration-500">
+<!-- Browser Header -->
+<div class="browser-chrome">
+<div class="w-3 h-3 rounded-full bg-red-400"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+<div class="url-bar">m.wikidata.org</div>
+</div>
+<!-- Web Content Simulation -->
+<div class="p-4 space-y-4 bg-white h-full relative">
+<div class="w-full h-8 bg-gray-100 rounded mb-2"></div>
+<div class="space-y-2">
+<div class="w-full h-2 bg-gray-100 rounded"></div>
+<div class="w-3/4 h-2 bg-gray-100 rounded"></div>
+<div class="w-5/6 h-2 bg-gray-100 rounded"></div>
+</div>
+<!-- "Limited" Overlay -->
+<div class="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center text-center p-4">
+<div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+<i class="fas fa-ban text-gray-400 text-2xl"></i>
+</div>
+<p class="text-sm font-bold text-gray-500">Editing Restricted</p>
+<p class="text-xs text-gray-400">Please use desktop for full features</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Problem List -->
+<div class="w-3/5 flex flex-col justify-center">
+<h2 class="text-2xl font-bold text-gray-700 mb-8 flex items-center gap-3">
+<i class="fas fa-tasks text-orange-500"></i>
+                Critical Limitations
+            </h2>
+<!-- Problem 1 -->
+<div class="problem-card">
+<div class="icon-circle">
+<i class="fas fa-tools"></i>
+</div>
+<div>
+<h3 class="text-xl font-bold text-gray-800 mb-2">Limited Functionality</h3>
+<p class="text-gray-600 leading-relaxed">
+                        The mobile web interface offers a restricted toolset. Contributors cannot access advanced editing features available on the desktop site, creating a barrier for power users.
+                    </p>
+</div>
+</div>
+<!-- Problem 2 -->
+<div class="problem-card" style="border-left-color: #FF7043;"> <!-- Deeper Orange -->
+<div class="icon-circle" style="color: #D84315; background-color: #FBE9E7;">
+<i class="fas fa-sitemap"></i>
+</div>
+<div>
+<h3 class="text-xl font-bold text-gray-800 mb-2">Complex Data Management</h3>
+<p class="text-gray-600 leading-relaxed">
+                        Managing structured knowledge is cumbersome. Users struggle to add references, edit qualifiers, or handle complex statements effectively on a small touch screen.
+                    </p>
+</div>
+</div>
+<!-- Problem 3 -->
+<div class="problem-card" style="border-left-color: #F4511E;"> <!-- Red-Orange -->
+<div class="icon-circle" style="color: #BF360C; background-color: #FFCCBC;">
+<i class="fas fa-user-clock"></i>
+</div>
+<div>
+<h3 class="text-xl font-bold text-gray-800 mb-2">User Constraints</h3>
+<p class="text-gray-600 leading-relaxed">
+                        The lack of a native experience leads to inefficient workflows. Zooming, scrolling, and non-optimized inputs significantly reduce productivity for volunteers on the move.
+                    </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Info -->
+<div class="absolute bottom-6 left-20 text-gray-400 text-xs font-mono">
+            Analysis of Current Mobile Web Platform
+        </div>
+</div>
+<script defer="" src="./vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;rayId&quot;:&quot;9b8f47f49d7e7ff8&quot;,&quot;serverTiming&quot;:{&quot;name&quot;:{&quot;cfExtPri&quot;:true,&quot;cfEdge&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfL4&quot;:true,&quot;cfSpeedBrain&quot;:true,&quot;cfCacheStatus&quot;:true}},&quot;version&quot;:&quot;2025.9.1&quot;,&quot;token&quot;:&quot;4edd5f8ec12a48cfa682ab8261b80a79&quot;}" crossorigin="anonymous"></script>
+
+<script src="./slide-inner.js.download"></script></body></html>

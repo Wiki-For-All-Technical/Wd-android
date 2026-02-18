@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)https://www.genspark.ai/api/files/s/6gz9puEy -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Proposed System - Features</title>
+<link href="https://fonts.googleapis.com/" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect">
+<link href="./css2" rel="stylesheet">
+<link href="./tailwind.min.css" rel="stylesheet">
+<link href="./all.min.css" rel="stylesheet">
+<style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            color: #202124;
+        }
+
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: #FAFAFA;
+        }
+
+        /* Abstract Background Shapes */
+        .bg-oval-1 {
+            position: absolute;
+            top: -100px;
+            left: 20%;
+            width: 800px;
+            height: 400px;
+            background-color: #E8F5E9; /* Light Green */
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.4;
+            transform: rotate(-5deg);
+        }
+
+        .bg-oval-2 {
+            position: absolute;
+            bottom: -100px;
+            right: 10%;
+            width: 600px;
+            height: 300px;
+            background-color: #E3F2FD; /* Light Blue */
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        /* Feature Card Styles */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 24px;
+            padding: 0 80px;
+            height: 100%;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #F3F4F6;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #E5E7EB;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover .icon-box {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .tech-tag {
+            font-size: 10px;
+            font-family: 'Roboto Mono', monospace;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #F3F4F6;
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+        /* Typography Override */
+        h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1F2937;
+            letter-spacing: -0.01em;
+        }
+
+        p {
+            margin: 0;
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.5;
+        }
+
+        /* Color Variations */
+        .theme-blue .icon-box { background-color: #E3F2FD; color: #1976D2; }
+        .theme-green .icon-box { background-color: #E8F5E9; color: #388E3C; }
+        .theme-purple .icon-box { background-color: #F3E5F5; color: #7B1FA2; }
+        .theme-orange .icon-box { background-color: #FFF3E0; color: #F57C00; }
+        .theme-teal .icon-box { background-color: #E0F2F1; color: #00796B; }
+        .theme-red .icon-box { background-color: #FFEBEE; color: #D32F2F; }
+
+        .top-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .theme-blue .top-accent { background-color: #1976D2; }
+        .theme-green .top-accent { background-color: #388E3C; }
+        .theme-purple .top-accent { background-color: #7B1FA2; }
+        .theme-orange .top-accent { background-color: #F57C00; }
+        .theme-teal .top-accent { background-color: #00796B; }
+        .theme-red .top-accent { background-color: #D32F2F; }
+
+    </style>
+<style id="slide-selected-style">
+  [data-slide-selected]::before
+  /* [data-slide-hover-selected]::before */ {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 100%;
+    height: 100%;
+    box-sizing: content-box;
+    padding: 4px;
+    border-radius: 0px;
+    outline: 2px solid #0f7fff !important;
+    z-index: 10000;
+    pointer-events: none;
+  }
+
+ /* [data-slide-hover-selected], */
+  [data-slide-selected] {
+    position: relative;
+    outline: none;
+    cursor: default;
+  }
+
+  img[data-slide-selected],
+  img[data-slide-hover-selected],
+  [data-slide-hover-selected],
+  [item-slide-click-selected],
+  [item-slide-selected] {
+    border: 2px solid #0f7fff !important;
+  }
+
+
+</style></head>
+<body>
+<div class="slide-container">
+<!-- Background Elements -->
+<div class="bg-oval-1"></div>
+<div class="bg-oval-2"></div>
+<!-- Header Section -->
+<div class="relative z-10 px-20 pt-10 pb-6">
+<div class="flex items-center gap-3 mb-2">
+<i class="fas fa-rocket text-green-600 text-xl"></i>
+<p class="text-green-600 font-bold tracking-wider text-sm uppercase">Solution Overview</p>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<h1 class="text-5xl font-black text-gray-800 tracking-tight">Proposed System</h1>
+<p class="text-xl text-gray-500 mt-2 font-light">Native Android architecture designed for performance and completeness.</p>
+</div>
+<div class="flex gap-2">
+<div class="h-2 w-2 rounded-full bg-green-500"></div>
+<div class="h-2 w-2 rounded-full bg-gray-300"></div>
+<div class="h-2 w-2 rounded-full bg-gray-300"></div>
+</div>
+</div>
+</div>
+<!-- Main Grid Content -->
+<div class="relative z-10 flex-1 pb-12 px-20">
+<div class="grid grid-cols-3 gap-6 h-full">
+<!-- Feature 1: Comprehensive Editing -->
+<div class="feature-card theme-blue">
+<div class="top-accent"></div>
+<div class="card-header">
+<div class="icon-box">
+<i class="fas fa-edit"></i>
+</div>
+<span class="tech-tag">Core Feature</span>
+</div>
+<h3>Comprehensive Editing</h3>
+<p>
+                        Full capability to view, create, and edit Items, Properties, and complex Statements. Supports adding References and Qualifiers natively.
+                    </p>
+</div>
+<!-- Feature 2: OAuth 2.0 -->
+<div class="feature-card theme-green">
+<div class="top-accent"></div>
+<div class="card-header">
+<div class="icon-box">
+<i class="fas fa-shield-alt"></i>
+</div>
+<span class="tech-tag">Security</span>
+</div>
+<h3>OAuth 2.0 Auth</h3>
+<p>
+                        Secure authentication flow directly via the Wikimedia API. Ensures all contributions are authorized, safe, and correctly attributed to the user.
+                    </p>
+</div>
+<!-- Feature 3: Modern UI -->
+<div class="feature-card theme-purple">
+<div class="top-accent"></div>
+<div class="card-header">
+<div class="icon-box">
+<i class="fas fa-palette"></i>
+</div>
+<span class="tech-tag">UI / UX</span>
+</div>
+<h3>Modern Interface</h3>
+<p>
+                        Built with Material Design principles. Features expandable cards, responsive lists, and intuitive navigation for a premium user experience.
+                    </p>
+</div>
+<!-- Feature 4: Offline Tracking -->
+<div class="feature-card theme-orange">
+<div class="top-accent"></div>
+<div class="card-header">
+<div class="icon-box">
+<i class="fas fa-history"></i>
+</div>
+<span class="tech-tag">Room DB</span>
+</div>
+<h3>Offline Activity Log</h3>
+<p>
+                        Local persistence layer using Room Database. Tracks all edits with timestamps and sync status, allowing users to review history even when offline.
+                    </p>
+</div>
+<!-- Feature 5: Networking -->
+<div class="feature-card theme-teal">
+<div class="top-accent"></div>
+<div class="card-header">
+<div class="icon-box">
+<i class="fas fa-network-wired"></i>
+</div>
+<span class="tech-tag">Retrofit</span>
+</div>
+<h3>Robust Networking</h3>
+<p>
+                        Powered by Retrofit for efficient API communication. Handles queued retries, conflict resolution, and network state management seamlessly.
+                    </p>
+</div>
+<!-- Feature 6: Observability -->
+<div class="feature-card theme-red">
+<div class="top-accent"></div>
+<div class="card-header">
+<div class="icon-box">
+<i class="fas fa-chart-line"></i>
+</div>
+<span class="tech-tag">Monitoring</span>
+</div>
+<h3>Observability</h3>
+<p>
+                        Detailed session edit history and clear error surfacing. Users receive immediate feedback on contribution status and potential API errors.
+                    </p>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="absolute bottom-6 right-20 text-gray-400 text-xs font-mono">
+            System Architecture Overview v1.0
+        </div>
+</div>
+<script defer="" src="./vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;rayId&quot;:&quot;9b8f47f49d807ff8&quot;,&quot;serverTiming&quot;:{&quot;name&quot;:{&quot;cfExtPri&quot;:true,&quot;cfEdge&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfL4&quot;:true,&quot;cfSpeedBrain&quot;:true,&quot;cfCacheStatus&quot;:true}},&quot;version&quot;:&quot;2025.9.1&quot;,&quot;token&quot;:&quot;4edd5f8ec12a48cfa682ab8261b80a79&quot;}" crossorigin="anonymous"></script>
+
+<script src="./slide-inner.js.download"></script></body></html>

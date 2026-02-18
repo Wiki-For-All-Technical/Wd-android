@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)https://www.genspark.ai/api/files/s/wHLvFLBm -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>System Requirements</title>
+<link href="https://fonts.googleapis.com/" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect">
+<link href="./css2" rel="stylesheet">
+<link href="./tailwind.min.css" rel="stylesheet">
+<link href="./all.min.css" rel="stylesheet">
+<style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            color: #202124;
+        }
+
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: #FAFAFA;
+        }
+
+        /* Technical Background Pattern */
+        .bg-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(#E0E0E0 1px, transparent 1px),
+                linear-gradient(90deg, #E0E0E0 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .bg-accent-corner {
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background-color: #E8F5E9; /* Light Green */
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        .bg-accent-bottom {
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 300px;
+            height: 300px;
+            background-color: #E3F2FD; /* Light Blue */
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        /* Column Cards */
+        .spec-column {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-top: 6px solid transparent;
+        }
+
+        .hardware-col { border-top-color: #374151; }
+        .software-col { border-top-color: #3DDC84; }
+
+        .column-header {
+            padding: 24px 32px 16px 32px;
+            border-bottom: 1px solid #F3F4F6;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .hardware-icon { background-color: #F3F4F6; color: #374151; }
+        .software-icon { background-color: #E8F5E9; color: #1B5E20; }
+
+        .spec-list {
+            padding: 24px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .item-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+            font-size: 16px;
+            background-color: #F9FAFB;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .spec-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6B7280;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .spec-value {
+            font-size: 16px;
+            color: #1F2937;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+            background-color: #E0E0E0;
+            color: #424242;
+        }
+
+        .software-tag { background-color: #E8F5E9; color: #1B5E20; }
+        .hardware-tag { background-color: #E3F2FD; color: #0D47A1; }
+
+    </style>
+<style id="slide-selected-style">
+  [data-slide-selected]::before
+  /* [data-slide-hover-selected]::before */ {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 100%;
+    height: 100%;
+    box-sizing: content-box;
+    padding: 4px;
+    border-radius: 0px;
+    outline: 2px solid #0f7fff !important;
+    z-index: 10000;
+    pointer-events: none;
+  }
+
+ /* [data-slide-hover-selected], */
+  [data-slide-selected] {
+    position: relative;
+    outline: none;
+    cursor: default;
+  }
+
+  img[data-slide-selected],
+  img[data-slide-hover-selected],
+  [data-slide-hover-selected],
+  [item-slide-click-selected],
+  [item-slide-selected] {
+    border: 2px solid #0f7fff !important;
+  }
+
+
+</style></head>
+<body>
+<div class="slide-container">
+<!-- Background Elements -->
+<div class="bg-grid"></div>
+<div class="bg-accent-corner"></div>
+<div class="bg-accent-bottom"></div>
+<!-- Header Section -->
+<div class="relative z-10 px-20 pt-10 pb-6">
+<div class="flex items-center gap-3 mb-2">
+<i class="fas fa-cogs text-gray-500 text-xl"></i>
+<p class="text-gray-500 font-bold tracking-wider text-sm uppercase">Prerequisites</p>
+</div>
+<h1 class="text-5xl font-black text-gray-800 tracking-tight">System Requirements</h1>
+<p class="text-xl text-gray-500 mt-2 font-light">Recommended configuration for development and deployment.</p>
+</div>
+<!-- Main Content Columns -->
+<div class="relative z-10 flex-1 px-20 pb-12 flex gap-10">
+<!-- Left Column: Hardware -->
+<div class="w-1/2 h-full">
+<div class="spec-column hardware-col">
+<div class="column-header">
+<div class="header-icon hardware-icon">
+<i class="fas fa-laptop-code"></i>
+</div>
+<div>
+<h2 class="text-2xl font-bold text-gray-800">Hardware</h2>
+<p class="text-gray-500 text-sm">Physical resource requirements</p>
+</div>
+</div>
+<div class="spec-list">
+<!-- Processor -->
+<div class="spec-item">
+<div class="item-icon">
+<i class="fas fa-microchip"></i>
+</div>
+<div class="item-content">
+<p class="spec-label">Processor</p>
+<p class="spec-value">Intel Core i5 or higher <span class="tag hardware-tag">x64</span></p>
+</div>
+</div>
+<!-- RAM -->
+<div class="spec-item">
+<div class="item-icon">
+<i class="fas fa-memory"></i>
+</div>
+<div class="item-content">
+<p class="spec-label">Memory (RAM)</p>
+<p class="spec-value">8 GB Minimum <span class="tag">16 GB Recommended</span></p>
+</div>
+</div>
+<!-- Storage -->
+<div class="spec-item">
+<div class="item-icon">
+<i class="fas fa-hdd"></i>
+</div>
+<div class="item-content">
+<p class="spec-label">Disk Space</p>
+<p class="spec-value">20 GB Free Space</p>
+</div>
+</div>
+<!-- Graphics -->
+<div class="spec-item">
+<div class="item-icon">
+<i class="fas fa-tv"></i>
+</div>
+<div class="item-content">
+<p class="spec-label">Graphics</p>
+<p class="spec-value">Integrated or Dedicated GPU <span class="text-xs text-gray-400 block mt-1">(Required for Emulator hardware acceleration)</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Software -->
+<div class="w-1/2 h-full">
+<div class="spec-column software-col">
+<div class="column-header">
+<div class="header-icon software-icon">
+<i class="fas fa-layer-group"></i>
+</div>
+<div>
+<h2 class="text-2xl font-bold text-gray-800">Software Stack</h2>
+<p class="text-gray-500 text-sm">Development environment &amp; libraries</p>
+</div>
+</div>
+<div class="spec-list">
+<!-- OS -->
+<div class="spec-item">
+<div class="item-icon">
+<i class="fab fa-windows"></i>
+</div>
+<div class="item-content">
+<p class="spec-label">Operating System</p>
+<p class="spec-value">Windows 10/11, Linux, or macOS</p>
+</div>
+</div>
+<!-- IDE -->
+<div class="spec-item">
+<div class="item-icon">
+<i class="fab fa-android text-green-600"></i>
+</div>
+<div class="item-content">
+<p class="spec-label">IDE</p>
+<p class="spec-value">Android Studio <span class="tag software-tag">Latest Stable</span></p>
+</div>
+</div>
+<!-- Languages -->
+<div class="spec-item">
+<div class="item-icon">
+<i class="fas fa-code text-orange-500"></i>
+</div>
+<div class="item-content">
+<p class="spec-label">Languages</p>
+<p class="spec-value font-mono">Kotlin / Java</p>
+</div>
+</div>
+<!-- Libraries Grid -->
+<div class="grid grid-cols-2 gap-4 mt-2">
+<div class="spec-item">
+<div class="item-content">
+<p class="spec-label">Database</p>
+<p class="spec-value font-mono text-sm">Room Database</p>
+</div>
+</div>
+<div class="spec-item">
+<div class="item-content">
+<p class="spec-label">Network</p>
+<p class="spec-value font-mono text-sm">Retrofit</p>
+</div>
+</div>
+<div class="spec-item">
+<div class="item-content">
+<p class="spec-label">VCS</p>
+<p class="spec-value font-mono text-sm">Git + GitHub</p>
+</div>
+</div>
+<div class="spec-item">
+<div class="item-content">
+<p class="spec-label">Build Tool</p>
+<p class="spec-value font-mono text-sm">Gradle</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Info -->
+<div class="absolute bottom-6 right-20 text-gray-400 text-xs font-mono">
+        Env Config v2.1
+    </div>
+</div>
+<script defer="" src="./vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;rayId&quot;:&quot;9b8f47f49d827ff8&quot;,&quot;serverTiming&quot;:{&quot;name&quot;:{&quot;cfExtPri&quot;:true,&quot;cfEdge&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfL4&quot;:true,&quot;cfSpeedBrain&quot;:true,&quot;cfCacheStatus&quot;:true}},&quot;version&quot;:&quot;2025.9.1&quot;,&quot;token&quot;:&quot;4edd5f8ec12a48cfa682ab8261b80a79&quot;}" crossorigin="anonymous"></script>
+
+<script src="./slide-inner.js.download"></script></body></html>
