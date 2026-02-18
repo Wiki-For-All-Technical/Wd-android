@@ -9,7 +9,8 @@ data class Entity(
     val descriptions: Map<String, Description>? = null,
     val aliases: Map<String, List<Alias>>? = null,
     val claims: Map<String, List<Claim>>? = null,
-    val sitelinks: Map<String, Sitelink>? = null
+    val sitelinks: Map<String, Sitelink>? = null,
+    val missing: String? = null  // present when entity not found
 )
 
 data class Label(

@@ -44,7 +44,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     packaging {
@@ -92,6 +92,9 @@ dependencies {
     // Ensure OkHttp is available
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+    // DataStore for settings
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
     // HTML Parsing
     implementation("org.jsoup:jsoup:1.17.2")
 
@@ -99,8 +102,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("io.coil-kt:coil-svg:2.5.0")
 
-    // Compose foundation
-    implementation("androidx.compose.foundation:foundation:1.5.4")
-    implementation("androidx.compose.material:material:1.5.4")
-    implementation("androidx.compose.material3:material3:1.1.2")
+    // Compose foundation - versions managed by BOM
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.material:material")
 }

@@ -1,12 +1,18 @@
 package com.example.myapp.network
 
-import com.example.myapp.data.SearchResponse
 import com.example.myapp.data.EntityResponse
-import com.example.myapp.data.RandomResponse
-import retrofit2.http.GET
-import retrofit2.http.Query
-
 import com.example.myapp.data.ParseResponse
+import com.example.myapp.data.RandomResponse
+import com.example.myapp.data.SearchResponse
+import com.example.myapp.data.EditResponse
+import com.example.myapp.data.TokenResponse
+import com.example.myapp.data.UserInfoResponse
+import retrofit2.Response
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface WikidataApiService {
 
@@ -26,18 +32,18 @@ interface WikidataApiService {
         @Query("language") language: String = "en",
         @Query("format") format: String = "json",
         @Query("offset") offset: Int = 0,
-        @Query("limit") limit: Int = 20,
-        // Added type=item to filter for regular items only, removing properties/lexemes/etc from general search
+        @Query("limit") limit: Int = 50,
         @Query("type") type: String = "item"
-    ): SearchResponse
+    ): Response<SearchResponse>
 
     @GET("w/api.php")
     suspend fun getEntity(
         @Query("action") action: String = "wbgetentities",
         @Query("ids") ids: String,
         @Query("format") format: String = "json",
-        @Query("languages") languages: String = "en"
-    ): EntityResponse
+        @Query("languages") languages: String = "en",
+        @Query("props") props: String = "labels|descriptions|claims|aliases|sitelinks"
+    ): Response<EntityResponse>
 
     @GET("w/api.php")
     suspend fun getRandomEntities(
@@ -47,4 +53,41 @@ interface WikidataApiService {
         @Query("rnlimit") rnlimit: Int = 1,
         @Query("format") format: String = "json"
     ): RandomResponse
+
+    @GET("w/api.php")
+    suspend fun getUserInfo(
+        @Query("action") action: String = "query",
+        @Query("meta") meta: String = "userinfo",
+        @Query("format") format: String = "json"
+    ): UserInfoResponse
+
+    @GET("w/api.php")
+    suspend fun getCsrfToken(
+        @Query("action") action: String = "query",
+        @Query("meta") meta: String = "tokens",
+        @Query("type") type: String = "csrf",
+        @Query("format") format: String = "json"
+    ): TokenResponse
+
+    @POST("w/api.php")
+    @FormUrlEncoded
+    suspend fun setLabel(
+        @Field("action") action: String = "wbsetlabel",
+        @Field("id") id: String,
+        @Field("language") language: String,
+        @Field("value") value: String,
+        @Field("token") token: String,
+        @Field("format") format: String = "json"
+    ): Response<EditResponse>
+
+    @POST("w/api.php")
+    @FormUrlEncoded
+    suspend fun setDescription(
+        @Field("action") action: String = "wbsetdescription",
+        @Field("id") id: String,
+        @Field("language") language: String,
+        @Field("value") value: String,
+        @Field("token") token: String,
+        @Field("format") format: String = "json"
+    ): Response<EditResponse>
 }
