@@ -90,4 +90,48 @@ interface WikidataApiService {
         @Field("token") token: String,
         @Field("format") format: String = "json"
     ): Response<EditResponse>
+
+    @POST("w/api.php")
+    @FormUrlEncoded
+    suspend fun createClaim(
+        @Field("action") action: String = "wbcreateclaim",
+        @Field("entity") entity: String,
+        @Field("property") property: String,
+        @Field("snaktype") snaktype: String = "value",
+        @Field("value") value: String,
+        @Field("token") token: String,
+        @Field("format") format: String = "json"
+    ): Response<EditResponse>
+
+    @POST("w/api.php")
+    @FormUrlEncoded
+    suspend fun setClaim(
+        @Field("action") action: String = "wbsetclaim",
+        @Field("claim") claim: String,
+        @Field("token") token: String,
+        @Field("format") format: String = "json"
+    ): Response<EditResponse>
+
+    @POST("w/api.php")
+    @FormUrlEncoded
+    suspend fun setQualifier(
+        @Field("action") action: String = "wbsetqualifier",
+        @Field("claim") claim: String,
+        @Field("property") property: String,
+        @Field("snaktype") snaktype: String = "value",
+        @Field("value") value: String,
+        @Field("token") token: String,
+        @Field("format") format: String = "json"
+    ): Response<EditResponse>
+
+    @POST("w/api.php")
+    @FormUrlEncoded
+    suspend fun setReference(
+        @Field("action") action: String = "wbsetreference",
+        @Field("statement") statement: String,
+        @Field("snaks") snaks: String,
+        @Field("snaks-order") snaksOrder: String,
+        @Field("token") token: String,
+        @Field("format") format: String = "json"
+    ): Response<EditResponse>
 }

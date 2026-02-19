@@ -84,6 +84,34 @@ class WikidataRepository {
         }
     }
 
+    /** Search Wikidata properties (for qualifier picker). Uses wbsearchentities with type=property. */
+    suspend fun searchProperties(
+        search: String,
+        language: String = "en",
+        offset: Int = 0,
+        limit: Int = 20
+    ): Result<SearchResponse> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.searchEntities(
+                search = search,
+                language = language,
+                offset = offset,
+                limit = limit,
+                type = "property"
+            )
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) Result.success(body)
+                else Result.failure(Exception("Empty response from server"))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                Result.failure(Exception("HTTP ${response.code()}: ${errorBody.take(200)}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Network error: ${e.message ?: e.toString()}"))
+        }
+    }
+
     suspend fun getEntity(entityId: String): Result<Entity> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.getEntity(ids = entityId)
@@ -225,6 +253,175 @@ class WikidataRepository {
                         }
                     } else {
                         Result.failure(Exception("HTTP ${response.code()}: ${response.message()}"))
+                    }
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
+            },
+            onFailure = { Result.failure(it) }
+        )
+    }
+
+    /** Build value for wbcreateclaim. For item/property use JSON; for string use datavalue JSON. */
+    private fun buildCreateClaimValue(value: String): String {
+        val trimmed = value.trim()
+        return when {
+            trimmed.matches(Regex("^Q\\d+$", RegexOption.IGNORE_CASE)) -> {
+                val numId = trimmed.drop(1).toIntOrNull() ?: 0
+                """{"entity-type":"item","numeric-id":$numId}"""
+            }
+            trimmed.matches(Regex("^P\\d+$", RegexOption.IGNORE_CASE)) -> {
+                val numId = trimmed.drop(1).toIntOrNull() ?: 0
+                """{"entity-type":"property","numeric-id":$numId}"""
+            }
+            else -> """{"type":"string","value":${escapeJsonString(trimmed)}}"""
+        }
+    }
+
+    /** Build value for wbsetqualifier (same format as create claim). */
+    private fun buildQualifierValue(value: String): String = buildCreateClaimValue(value)
+
+    /** Build full datavalue JSON for wbsetclaim/wbsetreference. */
+    private fun buildDatavalueJson(value: String): String {
+        val trimmed = value.trim()
+        return when {
+            trimmed.matches(Regex("^Q\\d+$", RegexOption.IGNORE_CASE)) -> {
+                val numId = trimmed.drop(1).toIntOrNull() ?: 0
+                val inner = """{"entity-type":"item","numeric-id":$numId}"""
+                """{"type":"wikibase-entityid","value":$inner}"""
+            }
+            trimmed.matches(Regex("^P\\d+$", RegexOption.IGNORE_CASE)) -> {
+                val numId = trimmed.drop(1).toIntOrNull() ?: 0
+                val inner = """{"entity-type":"property","numeric-id":$numId}"""
+                """{"type":"wikibase-entityid","value":$inner}"""
+            }
+            else -> """{"type":"string","value":${escapeJsonString(trimmed)}}"""
+        }
+    }
+
+    private fun escapeJsonString(s: String): String = "\"" + s
+        .replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\t", "\\t") + "\""
+
+    /** Create a new claim (statement) on an entity. Requires logged-in session. */
+    suspend fun createClaim(entityId: String, propertyId: String, value: String): Result<Unit> = withContext(Dispatchers.IO) {
+        getEditToken().fold(
+            onSuccess = { token ->
+                try {
+                    val valueJson = buildCreateClaimValue(value)
+                    val response = apiService.createClaim(
+                        entity = entityId,
+                        property = propertyId,
+                        snaktype = "value",
+                        value = valueJson,
+                        token = token
+                    )
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body?.error != null) {
+                            Result.failure(Exception(body.error.info ?: body.error.code ?: "Edit failed"))
+                        } else {
+                            Result.success(Unit)
+                        }
+                    } else {
+                        val errorBody = response.errorBody()?.string() ?: response.message()
+                        Result.failure(Exception("HTTP ${response.code()}: $errorBody"))
+                    }
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
+            },
+            onFailure = { Result.failure(it) }
+        )
+    }
+
+    /** Update an existing claim's main value. Requires claim GUID and new value. */
+    suspend fun setClaim(claimId: String, propertyId: String, newValue: String): Result<Unit> = withContext(Dispatchers.IO) {
+        getEditToken().fold(
+            onSuccess = { token ->
+                try {
+                    val datavalueJson = buildDatavalueJson(newValue)
+                    val claimJson = """{"id":"$claimId","type":"claim","mainsnak":{"snaktype":"value","property":"$propertyId","datavalue":$datavalueJson}}"""
+                    val response = apiService.setClaim(claim = claimJson, token = token)
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body?.error != null) {
+                            Result.failure(Exception(body.error.info ?: body.error.code ?: "Edit failed"))
+                        } else {
+                            Result.success(Unit)
+                        }
+                    } else {
+                        val errorBody = response.errorBody()?.string() ?: response.message()
+                        Result.failure(Exception("HTTP ${response.code()}: $errorBody"))
+                    }
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
+            },
+            onFailure = { Result.failure(it) }
+        )
+    }
+
+    /** Add or set a qualifier on a claim. Requires claim GUID, qualifier property, and value. */
+    suspend fun setQualifier(claimId: String, qualifierPropertyId: String, value: String): Result<Unit> = withContext(Dispatchers.IO) {
+        getEditToken().fold(
+            onSuccess = { token ->
+                try {
+                    val valueJson = buildQualifierValue(value)
+                    val response = apiService.setQualifier(
+                        claim = claimId,
+                        property = qualifierPropertyId,
+                        snaktype = "value",
+                        value = valueJson,
+                        token = token
+                    )
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body?.error != null) {
+                            Result.failure(Exception(body.error.info ?: body.error.code ?: "Edit failed"))
+                        } else {
+                            Result.success(Unit)
+                        }
+                    } else {
+                        val errorBody = response.errorBody()?.string() ?: response.message()
+                        Result.failure(Exception("HTTP ${response.code()}: $errorBody"))
+                    }
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
+            },
+            onFailure = { Result.failure(it) }
+        )
+    }
+
+    /** Add a reference to a statement. Requires statement GUID, reference property, and value. */
+    suspend fun setReference(statementId: String, refPropertyId: String, refValue: String): Result<Unit> = withContext(Dispatchers.IO) {
+        getEditToken().fold(
+            onSuccess = { token ->
+                try {
+                    val datavalueJson = buildDatavalueJson(refValue)
+                    val snak = """{"snaktype":"value","property":"$refPropertyId","datavalue":$datavalueJson}"""
+                    val snaks = """{"$refPropertyId":[$snak]}"""
+                    val snaksOrder = """["$refPropertyId"]"""
+                    val response = apiService.setReference(
+                        statement = statementId,
+                        snaks = snaks,
+                        snaksOrder = snaksOrder,
+                        token = token
+                    )
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body?.error != null) {
+                            Result.failure(Exception(body.error.info ?: body.error.code ?: "Edit failed"))
+                        } else {
+                            Result.success(Unit)
+                        }
+                    } else {
+                        val errorBody = response.errorBody()?.string() ?: response.message()
+                        Result.failure(Exception("HTTP ${response.code()}: $errorBody"))
                     }
                 } catch (e: Exception) {
                     Result.failure(e)

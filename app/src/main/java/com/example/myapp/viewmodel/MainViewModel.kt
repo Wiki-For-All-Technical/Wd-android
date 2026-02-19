@@ -43,6 +43,9 @@ class MainViewModel : ViewModel() {
     private val _propertyLabels = MutableStateFlow<Map<String, String>>(emptyMap())
     val propertyLabels: StateFlow<Map<String, String>> = _propertyLabels.asStateFlow()
 
+    private val _itemLabels = MutableStateFlow<Map<String, String>>(emptyMap())
+    val itemLabels: StateFlow<Map<String, String>> = _itemLabels.asStateFlow()
+
     // App State
     private val _currentView = MutableStateFlow(AppView.HOME)
     val currentView: StateFlow<AppView> = _currentView.asStateFlow()
@@ -87,7 +90,25 @@ class MainViewModel : ViewModel() {
 
     private val _searchOffset = MutableStateFlow(0)
     val searchOffset: StateFlow<Int> = _searchOffset.asStateFlow()
-    
+
+    // Qualifier property search (add qualifier flow)
+    private val _qualifierPropertySearchQuery = MutableStateFlow("")
+    val qualifierPropertySearchQuery: StateFlow<String> = _qualifierPropertySearchQuery.asStateFlow()
+    private val _qualifierPropertySuggestions = MutableStateFlow<List<SearchResult>>(emptyList())
+    val qualifierPropertySuggestions: StateFlow<List<SearchResult>> = _qualifierPropertySuggestions.asStateFlow()
+    private val _isQualifierPropertySuggestionsLoading = MutableStateFlow(false)
+    val isQualifierPropertySuggestionsLoading: StateFlow<Boolean> = _isQualifierPropertySuggestionsLoading.asStateFlow()
+    private var qualifierPropertySearchJob: Job? = null
+
+    // Value search (for statement/qualifier/reference value fields - entity suggestions)
+    private val _valueSearchQuery = MutableStateFlow("")
+    val valueSearchQuery: StateFlow<String> = _valueSearchQuery.asStateFlow()
+    private val _valueSuggestions = MutableStateFlow<List<SearchResult>>(emptyList())
+    val valueSuggestions: StateFlow<List<SearchResult>> = _valueSuggestions.asStateFlow()
+    private val _isValueSuggestionsLoading = MutableStateFlow(false)
+    val isValueSuggestionsLoading: StateFlow<Boolean> = _isValueSuggestionsLoading.asStateFlow()
+    private var valueSearchJob: Job? = null
+
     private var suggestionJob: Job? = null
     
     private val _refreshTrigger = MutableStateFlow(0)
@@ -124,6 +145,12 @@ class MainViewModel : ViewModel() {
     val editPropertyLabel: StateFlow<String?> = _editPropertyLabel.asStateFlow()
     private val _editCurrentValue = MutableStateFlow<String?>(null)
     val editCurrentValue: StateFlow<String?> = _editCurrentValue.asStateFlow()
+    private val _editClaimId = MutableStateFlow<String?>(null)
+    val editClaimId: StateFlow<String?> = _editClaimId.asStateFlow()
+    private val _editQualifierPropertyId = MutableStateFlow<String?>(null)
+    val editQualifierPropertyId: StateFlow<String?> = _editQualifierPropertyId.asStateFlow()
+    private val _editReferencePropertyId = MutableStateFlow<String?>(null)
+    val editReferencePropertyId: StateFlow<String?> = _editReferencePropertyId.asStateFlow()
 
     private val _isSaving = MutableStateFlow(false)
     val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
@@ -181,6 +208,70 @@ class MainViewModel : ViewModel() {
     fun clearSuggestions() {
         _searchSuggestions.value = emptyList()
     }
+
+    fun setQualifierPropertySearchQuery(term: String) {
+        _qualifierPropertySearchQuery.value = term
+        qualifierPropertySearchJob?.cancel()
+        if (term.isBlank()) {
+            _qualifierPropertySuggestions.value = emptyList()
+            _isQualifierPropertySuggestionsLoading.value = false
+            return
+        }
+        _isQualifierPropertySuggestionsLoading.value = true
+        qualifierPropertySearchJob = viewModelScope.launch {
+            delay(200)
+            repository.searchProperties(search = term, language = "en", offset = 0, limit = 15).fold(
+                onSuccess = { response ->
+                    _qualifierPropertySuggestions.value = response.search ?: emptyList()
+                    _isQualifierPropertySuggestionsLoading.value = false
+                },
+                onFailure = {
+                    Log.e("MainViewModel", "Qualifier property search failed", it)
+                    _qualifierPropertySuggestions.value = emptyList()
+                    _isQualifierPropertySuggestionsLoading.value = false
+                }
+            )
+        }
+    }
+
+    fun clearQualifierPropertySuggestions() {
+        qualifierPropertySearchJob?.cancel()
+        _qualifierPropertySearchQuery.value = ""
+        _qualifierPropertySuggestions.value = emptyList()
+        _isQualifierPropertySuggestionsLoading.value = false
+    }
+
+    fun setValueSearchQuery(term: String) {
+        _valueSearchQuery.value = term
+        valueSearchJob?.cancel()
+        if (term.isBlank()) {
+            _valueSuggestions.value = emptyList()
+            _isValueSuggestionsLoading.value = false
+            return
+        }
+        _isValueSuggestionsLoading.value = true
+        valueSearchJob = viewModelScope.launch {
+            delay(200)
+            repository.searchEntities(search = term, language = "en", offset = 0, limit = 15).fold(
+                onSuccess = { response ->
+                    _valueSuggestions.value = response.search ?: emptyList()
+                    _isValueSuggestionsLoading.value = false
+                },
+                onFailure = {
+                    Log.e("MainViewModel", "Value search failed", it)
+                    _valueSuggestions.value = emptyList()
+                    _isValueSuggestionsLoading.value = false
+                }
+            )
+        }
+    }
+
+    fun clearValueSuggestions() {
+        valueSearchJob?.cancel()
+        _valueSearchQuery.value = ""
+        _valueSuggestions.value = emptyList()
+        _isValueSuggestionsLoading.value = false
+    }
     
     fun clearSearchError() {
         _searchError.value = null
@@ -214,14 +305,17 @@ class MainViewModel : ViewModel() {
         _pendingEditEntityId.value = entityId
     }
 
-    /** Set context for Edit screen (mode + optional entity/property/value). */
+    /** Set context for Edit screen (mode + optional entity/property/value/claim). */
     fun setEditContext(
         mode: EditMode,
         title: String? = null,
         entityLabel: String = "",
         propertyId: String? = null,
         propertyLabel: String? = null,
-        currentValue: String? = null
+        currentValue: String? = null,
+        claimId: String? = null,
+        qualifierPropertyId: String? = null,
+        referencePropertyId: String? = null
     ) {
         _editMode.value = mode
         _editTitle.value = title
@@ -229,6 +323,9 @@ class MainViewModel : ViewModel() {
         _editPropertyId.value = propertyId
         _editPropertyLabel.value = propertyLabel
         _editCurrentValue.value = currentValue
+        _editClaimId.value = claimId
+        _editQualifierPropertyId.value = qualifierPropertyId
+        _editReferencePropertyId.value = referencePropertyId
     }
 
     fun clearEditContext() {
@@ -238,6 +335,14 @@ class MainViewModel : ViewModel() {
         _editPropertyId.value = null
         _editPropertyLabel.value = null
         _editCurrentValue.value = null
+        _editClaimId.value = null
+        _editQualifierPropertyId.value = null
+        _editReferencePropertyId.value = null
+        _editError.value = null
+        clearValueSuggestions()
+    }
+
+    fun clearEditError() {
         _editError.value = null
     }
 
@@ -286,9 +391,67 @@ class MainViewModel : ViewModel() {
                     }
                 }
                 EditMode.ADD_STATEMENT, EditMode.CREATE_ITEM -> {
-                    _editError.value = "Adding statements / creating items from the app is not supported yet. Use the website to add statements or create items."
-                    clearEditContext()
-                    if (entityId != null) navigateTo(AppView.ENTITY) else navigateTo(AppView.SEARCH)
+                    if (entityId.isNullOrEmpty()) {
+                        _editError.value = "No entity selected"
+                    } else {
+                        val claimId = _editClaimId.value
+                        val qualifierPropId = _editQualifierPropertyId.value
+                        val refPropId = _editReferencePropertyId.value
+                        val propId = _editPropertyId.value
+                        when {
+                            claimId != null && qualifierPropId != null -> {
+                                repository.setQualifier(claimId, qualifierPropId, newValue.trim()).fold(
+                                    onSuccess = {
+                                        loadEntity(entityId)
+                                        clearEditContext()
+                                        navigateTo(AppView.ENTITY)
+                                    },
+                                    onFailure = { e ->
+                                        _editError.value = e.message ?: "Failed to add qualifier"
+                                    }
+                                )
+                            }
+                            claimId != null && refPropId != null -> {
+                                repository.setReference(claimId, refPropId, newValue.trim()).fold(
+                                    onSuccess = {
+                                        loadEntity(entityId)
+                                        clearEditContext()
+                                        navigateTo(AppView.ENTITY)
+                                    },
+                                    onFailure = { e ->
+                                        _editError.value = e.message ?: "Failed to add reference"
+                                    }
+                                )
+                            }
+                            claimId != null && propId != null -> {
+                                repository.setClaim(claimId, propId, newValue.trim()).fold(
+                                    onSuccess = {
+                                        loadEntity(entityId)
+                                        clearEditContext()
+                                        navigateTo(AppView.ENTITY)
+                                    },
+                                    onFailure = { e ->
+                                        _editError.value = e.message ?: "Failed to edit statement"
+                                    }
+                                )
+                            }
+                            propId != null -> {
+                                repository.createClaim(entityId, propId, newValue.trim()).fold(
+                                    onSuccess = {
+                                        loadEntity(entityId)
+                                        clearEditContext()
+                                        navigateTo(AppView.ENTITY)
+                                    },
+                                    onFailure = { e ->
+                                        _editError.value = e.message ?: "Failed to add statement"
+                                    }
+                                )
+                            }
+                            else -> {
+                                _editError.value = "Missing property or claim"
+                            }
+                        }
+                    }
                 }
             }
             _isSaving.value = false
@@ -307,20 +470,39 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    // OAuth Login Logic
+    /**
+     * Check if user is logged in via Wikidata cookies (from WebView).
+     * Calls the Wikidata API with WebView cookies; if logged in, sets username and navigates.
+     * Call this after the WebView loads a page (e.g. after login redirect).
+     */
+    fun checkLoginFromCookies() {
+        viewModelScope.launch {
+            try {
+                delay(400) // Brief delay so cookies from redirect are synced to CookieManager
+                val userInfo = repository.getUserInfo()
+                val ui = userInfo.query.userinfo
+                val id = ui.id ?: 0
+                val name = ui.name?.trim()
+                if (id != 0 && !name.isNullOrBlank()) {
+                    _username.value = name
+                    _isLoggedIn.value = true
+                    Log.d("MainViewModel", "Logged in via Wikidata: $name")
+                    onLoginSuccessNavigate()
+                }
+            } catch (e: Exception) {
+                Log.w("MainViewModel", "Login check failed (user may not be logged in)", e)
+            }
+        }
+    }
+
+    // Login: navigates to login screen (Wikimedia login page in WebView)
     fun initiateOAuthLogin() {
         viewModelScope.launch {
             _isLoginLoading.value = true
             try {
-                // Open Wikidata OAuth authorization page
-                // For production, you need to register an OAuth consumer at:
-                // https://www.wikidata.org/wiki/Special:OAuthConsumerRegistration
-                // For now, we'll use the direct login page
-                val oauthUrl = "https://www.wikidata.org/wiki/Special:UserLogin?returnto=Main+Page&returntoquery="
-                _oauthUrl.value = oauthUrl
-                navigateTo(AppView.OAUTH_CONSENT)
+                navigateTo(AppView.LOGIN)
             } catch (e: Exception) {
-                Log.e("MainViewModel", "OAuth initiation failed", e)
+                Log.e("MainViewModel", "Login navigation failed", e)
             } finally {
                 _isLoginLoading.value = false
             }
@@ -450,13 +632,54 @@ class MainViewModel : ViewModel() {
                     _currentEntity.value = entity
                     _entityError.value = null
 
-                    // Pre-fetch property labels for a nicer statements view
-                    val propIds = entity.claims?.keys?.toList().orEmpty().distinct().take(50)
-                    if (propIds.isNotEmpty()) {
+                    // Pre-fetch property labels (P numbers) and item labels (Q numbers) for names
+                    val allPIds = mutableSetOf<String>()
+                    val allQIds = mutableSetOf<String>()
+                    fun addId(id: String?) {
+                        if (id == null) return
+                        when {
+                            id.startsWith("P") -> allPIds.add(id)
+                            id.startsWith("Q") -> allQIds.add(id)
+                        }
+                    }
+                    entity.claims?.keys?.let { allPIds.addAll(it) }
+                    entity.claims?.values?.forEach { claimList ->
+                        claimList.forEach { claim ->
+                            val v = claim.mainsnak.datavalue?.value
+                            if (v is Map<*, *>) addId((v["id"] ?: v["entity-id"])?.toString())
+                            claim.qualifiers?.keys?.let { allPIds.addAll(it) }
+                            claim.qualifiers?.values?.forEach { snakList ->
+                                snakList.forEach { snak ->
+                                    val qv = snak.datavalue?.value
+                                    if (qv is Map<*, *>) addId((qv["id"] ?: qv["entity-id"])?.toString())
+                                }
+                            }
+                            claim.references?.forEach { ref ->
+                                ref.snaks?.entries?.forEach { (pId, snakList) ->
+                                    allPIds.add(pId)
+                                    snakList.forEach { snak ->
+                                        val sv = snak.datavalue?.value
+                                        if (sv is Map<*, *>) addId((sv["id"] ?: sv["entity-id"])?.toString())
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    val allIds = (allPIds + allQIds).distinct().take(100)
+                    if (allIds.isNotEmpty()) {
                         viewModelScope.launch {
-                            repository.getPropertyLabels(propIds, language = "en").fold(
-                                onSuccess = { labels -> _propertyLabels.value = labels },
-                                onFailure = { Log.w("MainViewModel", "Property labels fetch failed", it) }
+                            repository.getEntities(allIds, "en", "labels").fold(
+                                onSuccess = { entities ->
+                                    val propLabels = entities.filterKeys { it.startsWith("P") }.mapValues { (key, e) ->
+                                        e.labels?.get("en")?.value ?: key
+                                    }
+                                    val itemLabelsMap = entities.filterKeys { it.startsWith("Q") }.mapValues { (key, e) ->
+                                        e.labels?.get("en")?.value ?: key
+                                    }
+                                    _propertyLabels.value = propLabels
+                                    _itemLabels.value = itemLabelsMap
+                                },
+                                onFailure = { Log.w("MainViewModel", "Labels fetch failed", it) }
                             )
                         }
                     }
